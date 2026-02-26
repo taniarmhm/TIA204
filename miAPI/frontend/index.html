@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gestión de Usuarios</title>
+    <style>
+        body { font-family: Arial; text-align: center; }
+        table { margin: auto; border-collapse: collapse; width: 60%; }
+        th, td { border: 1px solid black; padding: 8px; }
+        th { background-color: lightblue; }
+        input { margin: 5px; padding: 5px; }
+        button { padding: 6px 12px; }
+    </style>
+</head>
+<body>
+
+    <h2>Agregar Usuario</h2>
+
+    <input type="number" id="id" placeholder="ID">
+    <input type="text" id="nombre" placeholder="Nombre">
+    <input type="number" id="edad" placeholder="Edad">
+    <button onclick="agregarUsuario()">Agregar</button>
+
+    <h2>Lista de Usuarios</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Edad</th>
+            </tr>
+        </thead>
+        <tbody id="tablaUsuarios"></tbody>
+    </table>
+
+<script>
+const API = "http://127.0.0.1:8000";
+
+// Cargar usuarios al abrir
+window.onload = cargarUsuarios;
+
+async function cargarUsuarios() {
+    const response = await fetch(`${API}/v1/usuarios/`);
+    const data = await response.json();
+
+    const tabla = document.getElementById("tablaUsuarios");
+    tabla.innerHTML = "";
+
+    data.usuarios.forEach(usuario => {
+        tabla.innerHTML += `
+            <tr>
+                <td>${usuario.id}</td>
+                <td>${usuario.nombre}</td>
+                <td>${usuario.edad}</td>
+            </tr>
+        `;
+    });
+}
+
+async function agregarUsuario() {
+    const id = document.getElementById("id").value;
+    const nombre = document.getElementById("nombre").value;
+    const edad = document.getElementById("edad").value;
+
+    await fetch(`${API}/v1/usuarios/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: Number(id), nombre, edad: Number(edad) })
+    });
+
+    cargarUsuarios();
+}
+</script>
+
+</body>
+</html>
